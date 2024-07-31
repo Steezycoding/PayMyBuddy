@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: PayMyBuddy
+springdoc:
+  packages-to-scan: com.paymybuddy.webapp.resource
+  show-actuator: true
+  enable-spring-security: false
+  swagger-ui:
+    try-it-out-enabled: true
