@@ -16,3 +16,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
