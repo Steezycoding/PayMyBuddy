@@ -39,7 +39,7 @@ All Maven commands should be executed with `./mvnw`_
    ```sh
    cd springboot-app
    ```
-2. **Please give a check to the** [DATABASE.md](docs/database/DATABASE.md/scripts/database/DATABASE.md) **file located in _scripts/database_ folder**
+2. **Please give a check to the** [DATABASE.md](docs/database/DATABASE.md) **file located in _scripts/database_ folder**
 
 
 3. **Run app (with _dev_ profile) to enjoy development :**
