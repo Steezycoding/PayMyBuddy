@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: PayMyBuddy|DEV
+  datasource:
+    url: jdbc:mysql://localhost:3306/paymybuddy_dev_martru?serverTimezone=UTC
+    username: paymybuddy
+    password: paymybuddy
+  docker:
+    compose:
+      enabled: true
+      file: ./scripts/docker-compose.yml
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
