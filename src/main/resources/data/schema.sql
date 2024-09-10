@@ -20,23 +20,10 @@ CREATE TABLE IF NOT EXISTS `paymybuddy`.`users` (
     `username` VARCHAR(30) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(128) NOT NULL,
+    `role` VARCHAR(45) NOT NULL DEFAULT 'USER',
+    `balance` FLOAT NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
-);
-
--- -----------------------------------------------------
--- Table `paymybuddy`.`accounts`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `paymybuddy`.`accounts` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `balance` DOUBLE NOT NULL,
-    `user_id` INT NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `fk_account_user_idx` (`user_id` ASC) VISIBLE,
-    UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
-    CONSTRAINT `fk_account_user`
-        FOREIGN KEY (`user_id`)
-        REFERENCES `paymybuddy`.`users` (`id`)
 );
 
 

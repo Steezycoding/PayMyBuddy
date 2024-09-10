@@ -4,6 +4,7 @@
 - [Diagram references](#diagram-references)
 - [Docker compose installation](#docker-install)
 - [Manual installation](#manual-install)
+- [Development DB accounts](#initial-accounts)
 
 There is no specific profiles for switching between a _local_ or a _Docker MySQL_ database in the development environment. This could be part of a future improvement to the project.
 
@@ -73,6 +74,13 @@ Then, you have to edit the [application-dev.yml](../../src/main/resources/applic
 Finally, you have to execute the sql scripts provided in _**scripts/database**_ folder:
 - [db_schema_dev.sql](../../scripts/database/db_schema_dev.sql) to create the database and the tables
 - [db_data_dev.sql](../../scripts/database/db_data_dev.sql) to populate your tables with initial data
+
+### <a id="initial-accounts"></a># Development DB accounts
+| Type (role) | Username                                                            | Password |
+|:-----------:|:--------------------------------------------------------------------|:---------|
+|    Admin    | admin@paymybuddy.com                                                | admin    |
+|    User     | `<user>`@email.com<br/>_Possible values:_ mike, dustin, lucas, will | user     |
+
 
 ### # Additional note
 

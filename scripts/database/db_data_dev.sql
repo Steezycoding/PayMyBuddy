@@ -1,23 +1,13 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-/*CREATE SEQUENCE users_seq START WITH 5;
-CREATE SEQUENCE accounts_seq START WITH 5;
-CREATE SEQUENCE user_relationships_seq START WITH 7;
-CREATE SEQUENCE transactions_seq START WITH 4;*/
-
-INSERT INTO users (username, email, password)
+INSERT INTO users (username, email, password, role, balance)
 VALUES
-    ('Mike', 'paladin@email.com', 'MyGirlfriendFHasSuper-Powers'),
-    ('Dustin', 'dustybun@email.com', 'Never Ending Story'),
-    ('Lucas', 'ranger@email.com', 'My little sister is the Boss'),
-    ('Will', 'willthewise@email.com', 'I have an unmentionable secret :(');
+    ('Admin', 'admin@paymybuddy.com', '$2b$12$Mo5GJMCAU7UdPvBauGNL.uI73Yr.oYwt.teE8WsGoOUWLK85mpaOC', 'ADMIN', 0),
+    ('Mike', 'mike@email.com', '$2b$12$ZstSalnRGd5rdZZ7ZCktY.ny5v.qGzo1gzmbSl5HKt61yEKU7bFxm', 'USER', 90.00),
+    ('Dustin', 'dustin@email.com', '$2b$12$ZstSalnRGd5rdZZ7ZCktY.ny5v.qGzo1gzmbSl5HKt61yEKU7bFxm', 'USER', 88.50),
+    ('Lucas', 'lucas@email.com', '$2b$12$ZstSalnRGd5rdZZ7ZCktY.ny5v.qGzo1gzmbSl5HKt61yEKU7bFxm', 'USER', 122.50),
+    ('Will', 'will@email.com', '$2b$12$ZstSalnRGd5rdZZ7ZCktY.ny5v.qGzo1gzmbSl5HKt61yEKU7bFxm', 'USER', 15.00);
 
-INSERT INTO accounts (balance, user_id)
-VALUES
-    (90.00, 1),
-    (88.50, 2),
-    (122.50, 3),
-    (15.00, 4);
 
 INSERT INTO user_relationships (user_id, relation_user_id)
 VALUES
