@@ -1,0 +1,23 @@
+.container-box {
+    height: 100vh;
+}
+
+.credentials-box  {
+    width: 500px;
+    height: 688px;
+    padding: 40px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    text-align: center;
+}
+
+.logo {
+    width: 214px;
+    height: 64px;
+    background-color: #F69F1D;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: bold;
+}
