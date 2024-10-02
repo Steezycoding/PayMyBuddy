@@ -30,5 +30,5 @@ public class User {
 	private String role;
 
 	@Column(name = "balance", nullable = false)
-	private String balance;
+	private Float balance;
 }
