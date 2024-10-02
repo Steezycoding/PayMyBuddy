@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content" class="credentials-box d-flex flex-column align-items-center justify-content-around p-5 border border-black">
+        <div class="logo" role="img" aria-description="Logo of Pay My Buddy">Pay My Buddy</div>
+        <form th:action="@{/register}" method="post" class="d-flex flex-column align-items-center justify-content-around h-100 needs-validation" role="form">
+            <div>
+                <div class="form-floating mb-3">
+                    <input type="text" name="username" class="form-control" id="username" placeholder="Username" aria-required="true" required>
+                    <label for="username">Username</label>
+                    <div id="usernameHelpBlock" class="form-text text-start">
+                        Your username must be 3-30 characters long and can only contain letters, numbers, underscores, points and dashes.
+                    </div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Email" aria-required="true" required>
+                    <label for="email">Email</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" name="password" class="form-control" id="password" placeholder="Password" aria-required="true" required>
+                    <label for="password">Password</label>
+                    <div id="passwordHelpBlock" class="form-text text-start">
+                        Your password must be 8-128 characters long, contain letters, numbers, special characters and must NOT begin with space or contain emoji.
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
