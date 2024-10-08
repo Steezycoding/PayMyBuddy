@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"
+      lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -9,6 +11,7 @@
     <title th:text="${title}"></title>
 </head>
 <body>
+<div sec:authorize="isAuthenticated()" th:replace="~{layout/header :: header}"></div>
 <div class="container-fluid vh-100 d-flex flex-column align-items-center justify-content-center" role="main">
     <div th:replace="~{${view} :: content}"></div>
 </div>
