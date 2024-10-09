@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -50,7 +52,10 @@ public class RelationshipControllerTests {
 			mockMvc.perform(post("/relationships")
 							.param("email", validEmail))
 					.andExpect(status().is3xxRedirection())
-					.andExpect(redirectedUrl("/relationships"));
+					.andExpect(redirectedUrl("/relationships"))
+					.andExpect(flash().attributeExists("alert"))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("success"))))
+					.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Relation " + validEmail + " added successfully"))));
 		}
 
 		@Test
