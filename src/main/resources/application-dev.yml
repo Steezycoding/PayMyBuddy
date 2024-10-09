@@ -16,6 +16,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
+  thymeleaf:
+    cache: false
 logging:
   level:
     org:
