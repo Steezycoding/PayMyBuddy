@@ -1,6 +1,7 @@
 package com.paymybuddy.webapp.controller;
 
 import com.paymybuddy.webapp.controller.dto.EmailDTO;
+import com.paymybuddy.webapp.utils.Alert;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/relationships")
@@ -26,7 +28,7 @@ public class RelationshipController {
 	}
 
 	@PostMapping
-	public String addRelation(@Valid @ModelAttribute("emailDTO") EmailDTO emailDTO, BindingResult result, Model model) {
+	public String addRelation(@Valid @ModelAttribute("emailDTO") EmailDTO emailDTO, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			logger.info("User Relation email has errors {}", result.getAllErrors());
 
@@ -34,6 +36,13 @@ public class RelationshipController {
 			model.addAttribute("view", "relationships");
 			return "main-template";
 		}
+
+		Alert alert = Alert.builder()
+				.type("success")
+				.message("Relation " + emailDTO.getEmail() + " added successfully")
+				.build();
+		redirectAttributes.addFlashAttribute("alert", alert);
+
 		return "redirect:/relationships";
 	}
 }
