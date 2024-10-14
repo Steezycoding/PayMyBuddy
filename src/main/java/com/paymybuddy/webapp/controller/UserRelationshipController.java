@@ -1,6 +1,10 @@
 package com.paymybuddy.webapp.controller;
 
 import com.paymybuddy.webapp.controller.dto.EmailDTO;
+import com.paymybuddy.webapp.exception.UserException;
+import com.paymybuddy.webapp.exception.UserRelationshipException;
+import com.paymybuddy.webapp.model.UserRelationship;
+import com.paymybuddy.webapp.service.UserRelationshipService;
 import com.paymybuddy.webapp.utils.Alert;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -16,8 +20,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/relationships")
-public class RelationshipController {
+public class UserRelationshipController {
 	private final Logger logger = LoggerFactory.getLogger(RegisterController.class);
+
+	private final UserRelationshipService userRelationshipService;
+
+	public UserRelationshipController(UserRelationshipService userRelationshipService) {
+		this.userRelationshipService = userRelationshipService;
+	}
 
 	@GetMapping
 	public String relationshipsPage(Model model) {
@@ -35,14 +45,23 @@ public class RelationshipController {
 			model.addAttribute("title", "Relationships");
 			model.addAttribute("view", "relationships");
 			return "main-template";
+		} else {
+			Alert.AlertBuilder alert = Alert.builder();
+			try {
+				UserRelationship relation = userRelationshipService.addRelationship(emailDTO.getEmail());
+
+				alert.type("success").message("Relation " + relation.getRelationUserId().getEmail() + " added successfully");
+			} catch (UserException e) {
+				logger.warn("Relationship aborted: {}", e.getMessage());
+
+				alert.type("danger").message(e.getMessage());
+			} catch (UserRelationshipException e) {
+				logger.warn("Relationship aborted: {}", e.getMessage());
+
+				alert.type("warning").message(e.getMessage());
+			}
+			redirectAttributes.addFlashAttribute("alert", alert.build());
+			return "redirect:/relationships";
 		}
-
-		Alert alert = Alert.builder()
-				.type("success")
-				.message("Relation " + emailDTO.getEmail() + " added successfully")
-				.build();
-		redirectAttributes.addFlashAttribute("alert", alert);
-
-		return "redirect:/relationships";
 	}
 }
