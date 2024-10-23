@@ -118,7 +118,7 @@ public class UserRelationshipControllerTests {
 
 			mockMvc.perform(post("/relationships")
 						.param("email", validEmail))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("error"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("danger"))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Authenticated user cannot be found."))));
 
 			verify(userRelationshipService, times(1)).addRelationship(eq(validEmail));
@@ -131,7 +131,7 @@ public class UserRelationshipControllerTests {
 
 			mockMvc.perform(post("/relationships")
 							.param("email", validEmail))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("error"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("danger"))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo(String.format("User with email '%s' doesn't exist.", validEmail)))));
 
 			verify(userRelationshipService, times(1)).addRelationship(eq(validEmail));
