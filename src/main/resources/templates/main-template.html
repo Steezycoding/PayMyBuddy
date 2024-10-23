@@ -13,7 +13,7 @@
 <body>
 <div sec:authorize="isAuthenticated()" th:replace="~{layout/header :: header}"></div>
 <div class="container-fluid vh-100 d-flex flex-column align-items-center justify-content-center" role="main">
-    <div th:if="${alert != null}" th:classappend="'alert-' + ${alert.getType()}" class="alert alert-dismissible fade show position-absolute top-0" role="alert">
+    <div th:if="${alert != null}" th:classappend="'alert-' + ${alert.getType().toString().toLowerCase()}" class="alert alert-dismissible fade show position-absolute top-0" role="alert">
         <span th:text="${alert.getMessage()}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close alert"></button>
     </div>

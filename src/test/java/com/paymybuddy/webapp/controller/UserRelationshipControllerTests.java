@@ -7,6 +7,7 @@ import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.model.UserRelationship;
 import com.paymybuddy.webapp.model.UserRelationshipId;
 import com.paymybuddy.webapp.service.UserRelationshipService;
+import com.paymybuddy.webapp.utils.Alert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -79,7 +80,7 @@ public class UserRelationshipControllerTests {
 					.andExpect(status().is3xxRedirection())
 					.andExpect(redirectedUrl("/relationships"))
 					.andExpect(flash().attributeExists("alert"))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("success"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.SUCCESS))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Relation " + validEmail + " added successfully"))));
 		}
 
@@ -105,7 +106,7 @@ public class UserRelationshipControllerTests {
 					.andExpect(status().is3xxRedirection())
 					.andExpect(redirectedUrl("/relationships"))
 					.andExpect(flash().attributeExists("alert"))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("success"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.SUCCESS))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Relation " + validEmail + " added successfully"))));
 
 			verify(userRelationshipService, times(1)).addRelationship(eq(validEmail));
@@ -118,7 +119,7 @@ public class UserRelationshipControllerTests {
 
 			mockMvc.perform(post("/relationships")
 						.param("email", validEmail))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("danger"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.DANGER))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Authenticated user cannot be found."))));
 
 			verify(userRelationshipService, times(1)).addRelationship(eq(validEmail));
@@ -131,7 +132,7 @@ public class UserRelationshipControllerTests {
 
 			mockMvc.perform(post("/relationships")
 							.param("email", validEmail))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("danger"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.DANGER))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo(String.format("User with email '%s' doesn't exist.", validEmail)))));
 
 			verify(userRelationshipService, times(1)).addRelationship(eq(validEmail));
@@ -146,7 +147,7 @@ public class UserRelationshipControllerTests {
 
 			mockMvc.perform(post("/relationships")
 							.param("email", validEmail))
-					.andExpect(flash().attribute("alert", hasProperty("type", equalTo("warning"))))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.WARNING))))
 					.andExpect(flash().attribute("alert", hasProperty("message", equalTo(String.format(
 							"Relationship between %s and %s already exists.",
 							dummyRelationship.getUserId().getEmail(),

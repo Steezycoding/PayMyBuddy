@@ -50,15 +50,15 @@ public class UserRelationshipController {
 			try {
 				UserRelationship relation = userRelationshipService.addRelationship(emailDTO.getEmail());
 
-				alert.type("success").message("Relation " + relation.getRelationUserId().getEmail() + " added successfully");
+				alert.type(Alert.AlertType.SUCCESS).message("Relation " + relation.getRelationUserId().getEmail() + " added successfully");
 			} catch (UserException e) {
 				logger.warn("Relationship aborted: {}", e.getMessage());
 
-				alert.type("danger").message(e.getMessage());
+				alert.type(Alert.AlertType.DANGER).message(e.getMessage());
 			} catch (UserRelationshipException e) {
 				logger.warn("Relationship aborted: {}", e.getMessage());
 
-				alert.type("warning").message(e.getMessage());
+				alert.type(Alert.AlertType.WARNING).message(e.getMessage());
 			}
 			redirectAttributes.addFlashAttribute("alert", alert.build());
 			return "redirect:/relationships";

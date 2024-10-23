@@ -6,6 +6,13 @@ import lombok.Data;
 @Data
 @Builder
 public class Alert {
-	private String type;
+	private AlertType type;
 	private String message;
+
+	public enum AlertType {
+		DANGER,
+		INFO,
+		SUCCESS,
+		WARNING
+	}
 }
