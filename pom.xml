@@ -185,8 +185,9 @@
 					<excludes>
 						<exclude>com/paymybuddy/webapp/*Application*.*</exclude>
 						<exclude>com/paymybuddy/webapp/configuration/**</exclude>
-						<exclude>com/paymybuddy/webapp/model/*</exclude>
 						<exclude>com/paymybuddy/webapp/controller/dto/*</exclude>
+						<exclude>com/paymybuddy/webapp/model/*</exclude>
+						<exclude>com/paymybuddy/webapp/utils/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -344,8 +345,9 @@
 					<excludes>
 						<exclude>com/paymybuddy/webapp/*Application*.*</exclude>
 						<exclude>com/paymybuddy/webapp/configuration/**</exclude>
-						<exclude>com/paymybuddy/webapp/model/*</exclude>
 						<exclude>com/paymybuddy/webapp/controller/dto/*</exclude>
+						<exclude>com/paymybuddy/webapp/model/*</exclude>
+						<exclude>com/paymybuddy/webapp/utils/*</exclude>
 					</excludes>
 				</configuration>
 				<reportSets>
