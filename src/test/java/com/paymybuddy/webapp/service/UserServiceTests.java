@@ -2,14 +2,14 @@ package com.paymybuddy.webapp.service;
 
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.repository.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
@@ -22,6 +22,12 @@ import static org.mockito.Mockito.*;
 public class UserServiceTests {
 	@Mock
 	private UserRepository userRepository;
+
+	@Mock
+	private SecurityContext securityContext;
+
+	@Mock
+	private Authentication authentication;
 
 	@InjectMocks
 	private UserService userService;
@@ -63,6 +69,39 @@ public class UserServiceTests {
 			verify(userRepository, times(1)).findByEmail(eq("j.doe@email.com"));
 			assertThat(actual).isNotEmpty();
 			assertThat(Optional.of(actual)).hasValue(Optional.of(dummyUser));
+		}
+	}
+
+	@Nested
+	@DisplayName("getCurrentUser() Tests")
+	class GetCurrentUserTests {
+		@BeforeEach
+		void setUp() {
+			SecurityContextHolder.setContext(securityContext);
+		}
+
+		@Test
+		@DisplayName("Should return user if authentication exists")
+		void givenAuthenticationExists_whenGetCurrentUser_thenReturnUser() {
+			String authName = "j.doe@email.com";
+			when(securityContext.getAuthentication()).thenReturn(authentication);
+			when(authentication.getName()).thenReturn(authName);
+			when(userService.getUserByEmail("j.doe@email.com")).thenReturn(Optional.of(dummyUser));
+
+			Optional<User> result = userService.getCurrentUser();
+
+			assertThat(result).isPresent();
+			assertThat(result.get()).isEqualTo(dummyUser);
+		}
+
+		@Test
+		@DisplayName("Should return empty if authentication NOT exists")
+		void givenAuthenticationNotExists_whenGetCurrentUser_thenReturnEmpty() {
+			when(securityContext.getAuthentication()).thenReturn(null);
+
+			Optional<User> result = userService.getCurrentUser();
+
+			assertThat(result).isEmpty();
 		}
 	}
 

@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -24,6 +25,9 @@ public class UserService {
 
 	public Optional<User> getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (Objects.isNull(authentication)) {
+			return Optional.empty();
+		}
 		return getUserByEmail(authentication.getName());
 	}
 
