@@ -69,13 +69,12 @@ public class UserRelationshipService {
 
 		Optional<List<UserRelationship>> relationships = userRelationshipRepository.findByUserId(currentUser);
 
-		// A bit tricky
-		if (relationships.isPresent() && relationships.get().isEmpty()) {
-			relationships = Optional.empty();
+		if (relationships.isEmpty() || relationships.get().isEmpty()) {
+			throw new UserRelationshipNoRelationException(currentUser);
 		}
 
 		return relationships
-				.orElseThrow(() -> new UserRelationshipNoRelationException(currentUser))
+				.get()
 				.stream()
 				.map(UserRelationship::getRelationUserId)
 				.collect(Collectors.toList());

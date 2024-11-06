@@ -1,5 +1,6 @@
 package com.paymybuddy.webapp.controller;
 
+import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
 import com.paymybuddy.webapp.exception.UserRelationshipNoRelationException;
 import com.paymybuddy.webapp.model.User;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class MoneyTransactionControllerTests {
@@ -93,5 +95,75 @@ public class MoneyTransactionControllerTests {
 
 			verify(moneyTransactionService, times(1)).getUserRelationships();
 		}
+	}
+	@Nested
+	@DisplayName("POST /money-transaction Tests")
+	class PostMoneyTransactionTests {
+		private final MoneyTransactionDTO validTransactionDTO = MoneyTransactionDTO.builder()
+				.amount(150.00)
+				.description("Test transaction description")
+				.receiverUsername("k.epf")
+				.receiverEmail("k.epf@email.com")
+				.build();
+
+		@Test
+		@DisplayName("Should create a transaction between users")
+		void shouldCreateTransactionBetweenCurrentUserAndRelation() throws Exception {
+			mockMvc.perform(post("/money-transactions")
+							.param("receiverEmail", validTransactionDTO.getReceiverEmail())
+							.param("receiverUsername", validTransactionDTO.getReceiverUsername())
+							.param("description", validTransactionDTO.getDescription())
+							.param("amount", String.valueOf(validTransactionDTO.getAmount())))
+					.andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("/money-transactions"))
+					.andExpect(flash().attributeExists("alert"))
+					.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.SUCCESS))))
+					.andExpect(flash().attribute("alert", hasProperty("message",
+							equalTo(String.format("The payment was successfully sent to %s.", validTransactionDTO.getReceiverUsername()))
+					)));
+
+			verify(moneyTransactionService, times(1)).createMoneyTransaction(eq(validTransactionDTO));
+		}
+
+		//# Start of form validation tests
+		@Test
+		@DisplayName("Should NOT submit form and display errors with invalid receiver email")
+		void shouldNotSubmitFormWithInvalidReceiverId() throws Exception {
+			mockMvc.perform(post("/money-transactions")
+					.param("receiverEmail", "")
+					.param("receiverUsername", validTransactionDTO.getReceiverUsername())
+					.param("description", validTransactionDTO.getDescription())
+					.param("amount", String.valueOf(validTransactionDTO.getAmount())))
+					.andExpect(view().name("main-template"))
+					.andExpect(model().attribute("view", "money-transactions"))
+					.andExpect(model().attributeHasFieldErrors("transaction", "receiverEmail"));
+		}
+
+		@Test
+		@DisplayName("Should NOT submit form and display errors with invalid receiver username")
+		void shouldNotSubmitFormWithInvalidReceiverUsername() throws Exception {
+			mockMvc.perform(post("/money-transactions")
+							.param("receiverEmail", validTransactionDTO.getReceiverEmail())
+							.param("receiverUsername", "")
+							.param("description", validTransactionDTO.getDescription())
+							.param("amount", "100"))
+					.andExpect(view().name("main-template"))
+					.andExpect(model().attribute("view", "money-transactions"))
+					.andExpect(model().attributeHasFieldErrors("transaction", "receiverUsername"));
+		}
+
+		@Test
+		@DisplayName("Should NOT submit form and display errors with invalid amount")
+		void shouldNotSubmitFormWithInvalidAmount() throws Exception {
+			mockMvc.perform(post("/money-transactions")
+							.param("receiverEmail", validTransactionDTO.getReceiverEmail())
+							.param("receiverUsername", validTransactionDTO.getReceiverUsername())
+							.param("description", validTransactionDTO.getDescription())
+							.param("amount", "0.99"))
+					.andExpect(view().name("main-template"))
+					.andExpect(model().attribute("view", "money-transactions"))
+					.andExpect(model().attributeHasFieldErrors("transaction", "amount"));
+		}
+		//# End of form validation tests
 	}
 }
