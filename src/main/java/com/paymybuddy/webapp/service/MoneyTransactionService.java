@@ -2,10 +2,7 @@ package com.paymybuddy.webapp.service;
 
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
-import com.paymybuddy.webapp.exception.MoneyTransactionException;
-import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
-import com.paymybuddy.webapp.exception.UserContextNotFoundException;
-import com.paymybuddy.webapp.exception.UserNotFoundException;
+import com.paymybuddy.webapp.exception.*;
 import com.paymybuddy.webapp.model.MoneyTransaction;
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.repository.MoneyTransactionRepository;
@@ -95,6 +92,10 @@ public class MoneyTransactionService {
 	private void validateTransaction(MoneyTransactionDTO transactionDTO) {
 		if (transactionDTO.getAmount() < 0) {
 			throw new MoneyTransactionNegativeAmountException();
+		}
+
+		if (transactionDTO.getAmount() < 1) {
+			throw new MoneyTransactionBelowMinimumAmountException(1.0);
 		}
 	}
 }

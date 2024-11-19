@@ -2,6 +2,7 @@ package com.paymybuddy.webapp.service;
 
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
+import com.paymybuddy.webapp.exception.MoneyTransactionBelowMinimumAmountException;
 import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.model.MoneyTransaction;
 import com.paymybuddy.webapp.model.User;
@@ -165,6 +166,25 @@ class MoneyTransactionServiceTests {
 					.hasMessage("Money transaction amount cannot be negative.");
 
 			verify(userService, times(1)).getCurrentUser();
+			verify(userService, times(1)).getUserByEmail(eq(dummyTransactionDTO.getReceiverEmail()));
+			verifyNoMoreInteractions(userService);
+			verifyNoInteractions(moneyTransactionRepository);
+		}
+
+		@Test
+		@DisplayName("Should throw exception when transaction amount is below minimum amount")
+		void givenBelowMinimumAmountTransaction_whenCreateMoneyTransaction_thenThrowMoneyTransactionBelowMinimumAmountException() {
+			dummyTransactionDTO.setAmount(0.5);
+
+			when(userService.getCurrentUser()).thenReturn(Optional.of(dummyAuthUser));
+			when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(dummyReceiverUser));
+
+			assertThatThrownBy(() -> moneyTransactionService.createMoneyTransaction(dummyTransactionDTO))
+					.isInstanceOf(MoneyTransactionBelowMinimumAmountException.class)
+					.hasMessage("Money transaction amount cannot be below minimum amount (minimum: 1.0).");
+
+			verify(userService, times(1)).getCurrentUser();
+			verify(userService, times(1)).getUserByEmail(eq(dummyTransactionDTO.getReceiverEmail()));
 			verifyNoMoreInteractions(userService);
 			verifyNoInteractions(moneyTransactionRepository);
 		}
