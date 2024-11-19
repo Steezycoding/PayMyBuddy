@@ -2,6 +2,9 @@ package com.paymybuddy.webapp.controller;
 
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
+import com.paymybuddy.webapp.exception.MoneyTransactionBelowMinimumAmountException;
+import com.paymybuddy.webapp.exception.MoneyTransactionExceedsSenderBalanceException;
+import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.exception.UserRelationshipNoRelationException;
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.service.MoneyTransactionService;
@@ -15,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +100,7 @@ public class MoneyTransactionControllerTests {
 			verify(moneyTransactionService, times(1)).getUserRelationships();
 		}
 	}
+
 	@Nested
 	@DisplayName("POST /money-transaction Tests")
 	class PostMoneyTransactionTests {
@@ -125,7 +130,49 @@ public class MoneyTransactionControllerTests {
 			verify(moneyTransactionService, times(1)).createMoneyTransaction(eq(validTransactionDTO));
 		}
 
-		//# Start of form validation tests
+		@Nested
+		@DisplayName("Form Validation Tests")
+		class FormValidationTests {
+			@Test
+			@DisplayName("Should NOT submit form and display errors with empty receiver email")
+			void shouldNotSubmitFormWithEmptyReceiverEmail() throws Exception {
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", "")
+								.param("receiverUsername", validTransactionDTO.getReceiverUsername())
+								.param("description", validTransactionDTO.getDescription())
+								.param("amount", String.valueOf(validTransactionDTO.getAmount())))
+						.andExpect(view().name("main-template"))
+						.andExpect(model().attribute("view", "money-transactions"))
+						.andExpect(model().attributeHasFieldErrors("transaction", "receiverEmail"));
+			}
+
+			@Test
+			@DisplayName("Should NOT submit form and display errors with empty receiver username")
+			void shouldNotSubmitFormWithEmptyReceiverUsername() throws Exception {
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", validTransactionDTO.getReceiverEmail())
+								.param("receiverUsername", "")
+								.param("description", validTransactionDTO.getDescription())
+								.param("amount", String.valueOf(validTransactionDTO.getAmount())))
+						.andExpect(view().name("main-template"))
+						.andExpect(model().attribute("view", "money-transactions"))
+						.andExpect(model().attributeHasFieldErrors("transaction", "receiverUsername"));
+			}
+
+			@Test
+			@DisplayName("Should NOT submit form and display errors with empty amount")
+			void shouldNotSubmitFormWithEmptyAmount() throws Exception {
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", validTransactionDTO.getReceiverEmail())
+								.param("receiverUsername", validTransactionDTO.getReceiverUsername())
+								.param("description", validTransactionDTO.getDescription())
+								.param("amount", ""))
+						.andExpect(view().name("main-template"))
+						.andExpect(model().attribute("view", "money-transactions"))
+						.andExpect(model().attributeHasFieldErrors("transaction", "amount"));
+			}
+		}
+
 		@Test
 		@DisplayName("Should NOT submit form and display errors with invalid receiver email")
 		void shouldNotSubmitFormWithInvalidReceiverId() throws Exception {
@@ -164,6 +211,92 @@ public class MoneyTransactionControllerTests {
 					.andExpect(model().attribute("view", "money-transactions"))
 					.andExpect(model().attributeHasFieldErrors("transaction", "amount"));
 		}
-		//# End of form validation tests
+
+		@Nested
+		@DisplayName("Exception Handling Tests")
+		class ExceptionHandlingTests {
+			@Mock
+			private Validator validator;
+
+			private final MoneyTransactionDTO invalidAmountTransactionDTO = MoneyTransactionDTO.builder()
+					.description("Test transaction description")
+					.receiverUsername("k.epf")
+					.receiverEmail("k.epf@email.com")
+					.build();
+
+			@BeforeEach
+			void setUp() {
+				MockitoAnnotations.openMocks(this);
+				mockMvc = MockMvcBuilders.standaloneSetup(moneyTransactionController)
+						.setValidator(validator)
+						.build();
+			}
+
+			@Test
+			@DisplayName("Should handle exception if transaction amount is negative")
+			void shouldHandleExceptionIfTransactionAmountIsNegative() throws Exception {
+				invalidAmountTransactionDTO.setAmount(-10.0);
+				doThrow(new MoneyTransactionNegativeAmountException())
+						.when(moneyTransactionService)
+						.createMoneyTransaction(eq(invalidAmountTransactionDTO));
+
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", invalidAmountTransactionDTO.getReceiverEmail())
+								.param("receiverUsername", invalidAmountTransactionDTO.getReceiverUsername())
+								.param("description", invalidAmountTransactionDTO.getDescription())
+								.param("amount", String.valueOf(invalidAmountTransactionDTO.getAmount())))
+						.andExpect(status().is3xxRedirection())
+						.andExpect(redirectedUrl("/money-transactions"))
+						.andExpect(flash().attributeExists("alert"))
+						.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.DANGER))))
+						.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Transaction amount cannot be negative."))));
+
+				verify(moneyTransactionService, times(1)).createMoneyTransaction(eq(invalidAmountTransactionDTO));
+			}
+
+			@Test
+			@DisplayName("Should handle exception if transaction amount is below minimum amount")
+			void shouldHandleExceptionIfTransactionAmountIsBelowMinimumAmount() throws Exception {
+				invalidAmountTransactionDTO.setAmount(0.5);
+				doThrow(new MoneyTransactionBelowMinimumAmountException(1.0))
+						.when(moneyTransactionService)
+						.createMoneyTransaction(eq(invalidAmountTransactionDTO));
+
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", invalidAmountTransactionDTO.getReceiverEmail())
+								.param("receiverUsername", invalidAmountTransactionDTO.getReceiverUsername())
+								.param("description", invalidAmountTransactionDTO.getDescription())
+								.param("amount", String.valueOf(invalidAmountTransactionDTO.getAmount())))
+						.andExpect(status().is3xxRedirection())
+						.andExpect(redirectedUrl("/money-transactions"))
+						.andExpect(flash().attributeExists("alert"))
+						.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.DANGER))))
+						.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Transaction amount cannot be below the minimum amount."))));
+
+				verify(moneyTransactionService, times(1)).createMoneyTransaction(eq(invalidAmountTransactionDTO));
+			}
+
+			@Test
+			@DisplayName("Should handle exception if transaction amount exceeds sender balance")
+			void shouldHandleExceptionIfTransactionAmountExceedsSenderBalance() throws Exception {
+				invalidAmountTransactionDTO.setAmount(999999999.0);
+				doThrow(new MoneyTransactionExceedsSenderBalanceException())
+						.when(moneyTransactionService)
+						.createMoneyTransaction(invalidAmountTransactionDTO);
+
+				mockMvc.perform(post("/money-transactions")
+								.param("receiverEmail", invalidAmountTransactionDTO.getReceiverEmail())
+								.param("receiverUsername", invalidAmountTransactionDTO.getReceiverUsername())
+								.param("description", invalidAmountTransactionDTO.getDescription())
+								.param("amount", String.valueOf(invalidAmountTransactionDTO.getAmount())))
+						.andExpect(status().is3xxRedirection())
+						.andExpect(redirectedUrl("/money-transactions"))
+						.andExpect(flash().attributeExists("alert"))
+						.andExpect(flash().attribute("alert", hasProperty("type", equalTo(Alert.AlertType.DANGER))))
+						.andExpect(flash().attribute("alert", hasProperty("message", equalTo("Transaction amount exceeds your balance."))));
+
+				verify(moneyTransactionService, times(1)).createMoneyTransaction(eq(invalidAmountTransactionDTO));
+			}
+		}
 	}
 }

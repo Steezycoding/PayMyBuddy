@@ -2,6 +2,9 @@ package com.paymybuddy.webapp.controller;
 
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
+import com.paymybuddy.webapp.exception.MoneyTransactionBelowMinimumAmountException;
+import com.paymybuddy.webapp.exception.MoneyTransactionExceedsSenderBalanceException;
+import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.exception.UserRelationshipNoRelationException;
 import com.paymybuddy.webapp.service.MoneyTransactionService;
 import com.paymybuddy.webapp.utils.Alert;
@@ -76,5 +79,47 @@ public class MoneyTransactionController {
 		redirectAttributes.addFlashAttribute(alert);
 
 		return "redirect:/relationships";
+	}
+
+	@ExceptionHandler(MoneyTransactionNegativeAmountException.class)
+	public String handleNegativeAmountException(MoneyTransactionNegativeAmountException e, RedirectAttributes redirectAttributes) {
+		logger.error(e.getMessage());
+
+		Alert alert = Alert.builder()
+				.type(Alert.AlertType.DANGER)
+				.message("Transaction amount cannot be negative.")
+				.build();
+
+		redirectAttributes.addFlashAttribute(alert);
+
+		return "redirect:/money-transactions";
+	}
+
+	@ExceptionHandler(MoneyTransactionBelowMinimumAmountException.class)
+	public String handleBelowMinimumAmountException(MoneyTransactionBelowMinimumAmountException e, RedirectAttributes redirectAttributes) {
+		logger.error(e.getMessage());
+
+		Alert alert = Alert.builder()
+				.type(Alert.AlertType.DANGER)
+				.message("Transaction amount cannot be below the minimum amount.")
+				.build();
+
+		redirectAttributes.addFlashAttribute(alert);
+
+		return "redirect:/money-transactions";
+	}
+
+	@ExceptionHandler(MoneyTransactionExceedsSenderBalanceException.class)
+	public String handleExceedsSenderBalanceException(MoneyTransactionExceedsSenderBalanceException e, RedirectAttributes redirectAttributes) {
+		logger.error(e.getMessage());
+
+		Alert alert = Alert.builder()
+				.type(Alert.AlertType.DANGER)
+				.message("Transaction amount exceeds your balance.")
+				.build();
+
+		redirectAttributes.addFlashAttribute(alert);
+
+		return "redirect:/money-transactions";
 	}
 }
