@@ -3,6 +3,7 @@ package com.paymybuddy.webapp.service;
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
 import com.paymybuddy.webapp.exception.MoneyTransactionException;
+import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.exception.UserContextNotFoundException;
 import com.paymybuddy.webapp.exception.UserNotFoundException;
 import com.paymybuddy.webapp.model.MoneyTransaction;
@@ -55,6 +56,8 @@ public class MoneyTransactionService {
 		User receiver = userService.getUserByEmail(transactionDTO.getReceiverEmail())
 				.orElseThrow(() -> new UserNotFoundException(transactionDTO.getReceiverEmail()));
 
+		validateTransaction(transactionDTO);
+
 		MoneyTransaction transaction = handleTransaction(sender, receiver, transactionDTO);
 		moneyTransactionRepository.save(transaction);
 	}
@@ -81,6 +84,17 @@ public class MoneyTransactionService {
 			return transaction;
 		} catch (Exception e) {
 			throw new MoneyTransactionException(e.getMessage());
+		}
+	}
+
+	/**
+	 * Validate the money transaction.
+	 *
+	 * @throws MoneyTransactionNegativeAmountException if the transaction amount is negative
+	 */
+	private void validateTransaction(MoneyTransactionDTO transactionDTO) {
+		if (transactionDTO.getAmount() < 0) {
+			throw new MoneyTransactionNegativeAmountException();
 		}
 	}
 }

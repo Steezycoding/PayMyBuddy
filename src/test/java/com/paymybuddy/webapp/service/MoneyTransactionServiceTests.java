@@ -2,6 +2,7 @@ package com.paymybuddy.webapp.service;
 
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
+import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.model.MoneyTransaction;
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.repository.MoneyTransactionRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -148,6 +150,23 @@ class MoneyTransactionServiceTests {
 			verifyNoMoreInteractions(userService);
 			verify(moneyTransactionRepository, times(1)).save(eq(expectedTransaction));
 			verifyNoMoreInteractions(moneyTransactionRepository);
+		}
+
+		@Test
+		@DisplayName("Should throw exception when transaction amount is negative")
+		void givenNegativeAmountTransaction_whenCreateMoneyTransaction_thenThrowMoneyTransactionNegativeAmountException() {
+			dummyTransactionDTO.setAmount(-25.75);
+
+			when(userService.getCurrentUser()).thenReturn(Optional.of(dummyAuthUser));
+			when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(dummyReceiverUser));
+
+			assertThatThrownBy(() -> moneyTransactionService.createMoneyTransaction(dummyTransactionDTO))
+					.isInstanceOf(MoneyTransactionNegativeAmountException.class)
+					.hasMessage("Money transaction amount cannot be negative.");
+
+			verify(userService, times(1)).getCurrentUser();
+			verifyNoMoreInteractions(userService);
+			verifyNoInteractions(moneyTransactionRepository);
 		}
 	}
 }
