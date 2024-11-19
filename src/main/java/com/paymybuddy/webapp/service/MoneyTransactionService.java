@@ -53,7 +53,7 @@ public class MoneyTransactionService {
 		User receiver = userService.getUserByEmail(transactionDTO.getReceiverEmail())
 				.orElseThrow(() -> new UserNotFoundException(transactionDTO.getReceiverEmail()));
 
-		validateTransaction(transactionDTO);
+		validateTransaction(transactionDTO, sender);
 
 		MoneyTransaction transaction = handleTransaction(sender, receiver, transactionDTO);
 		moneyTransactionRepository.save(transaction);
@@ -89,13 +89,17 @@ public class MoneyTransactionService {
 	 *
 	 * @throws MoneyTransactionNegativeAmountException if the transaction amount is negative
 	 */
-	private void validateTransaction(MoneyTransactionDTO transactionDTO) {
+	private void validateTransaction(MoneyTransactionDTO transactionDTO, User sender) {
 		if (transactionDTO.getAmount() < 0) {
 			throw new MoneyTransactionNegativeAmountException();
 		}
 
 		if (transactionDTO.getAmount() < 1) {
 			throw new MoneyTransactionBelowMinimumAmountException(1.0);
+		}
+
+		if (sender.getBalance() < transactionDTO.getAmount()) {
+			throw new MoneyTransactionExceedsSenderBalanceException();
 		}
 	}
 }

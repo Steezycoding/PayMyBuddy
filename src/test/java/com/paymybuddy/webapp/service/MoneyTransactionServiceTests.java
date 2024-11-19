@@ -3,6 +3,7 @@ package com.paymybuddy.webapp.service;
 import com.paymybuddy.webapp.controller.dto.MoneyTransactionDTO;
 import com.paymybuddy.webapp.controller.dto.UserContactDTO;
 import com.paymybuddy.webapp.exception.MoneyTransactionBelowMinimumAmountException;
+import com.paymybuddy.webapp.exception.MoneyTransactionExceedsSenderBalanceException;
 import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.model.MoneyTransaction;
 import com.paymybuddy.webapp.model.User;
@@ -182,6 +183,24 @@ class MoneyTransactionServiceTests {
 			assertThatThrownBy(() -> moneyTransactionService.createMoneyTransaction(dummyTransactionDTO))
 					.isInstanceOf(MoneyTransactionBelowMinimumAmountException.class)
 					.hasMessage("Money transaction amount cannot be below minimum amount (minimum: 1.0).");
+
+			verify(userService, times(1)).getCurrentUser();
+			verify(userService, times(1)).getUserByEmail(eq(dummyTransactionDTO.getReceiverEmail()));
+			verifyNoMoreInteractions(userService);
+			verifyNoInteractions(moneyTransactionRepository);
+		}
+
+		@Test
+		@DisplayName("Should throw exception when transaction amount exceeds sender balance")
+		void givenExceedsSenderBalanceTransaction_whenCreateMoneyTransaction_thenThrowMoneyTransactionExceedsSenderBalanceException() {
+			dummyTransactionDTO.setAmount(150.0);
+
+			when(userService.getCurrentUser()).thenReturn(Optional.of(dummyAuthUser));
+			when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(dummyReceiverUser));
+
+			assertThatThrownBy(() -> moneyTransactionService.createMoneyTransaction(dummyTransactionDTO))
+					.isInstanceOf(MoneyTransactionExceedsSenderBalanceException.class)
+					.hasMessage("Money transaction amount cannot be above sender balance.");
 
 			verify(userService, times(1)).getCurrentUser();
 			verify(userService, times(1)).getUserByEmail(eq(dummyTransactionDTO.getReceiverEmail()));
