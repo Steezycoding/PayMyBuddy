@@ -3,8 +3,11 @@ package com.paymybuddy.webapp.service;
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -18,6 +21,14 @@ public class UserService {
 
 	public Optional<User> getUserByEmail(String email) {
 		return userRepository.findByEmail(email);
+	}
+
+	public Optional<User> getCurrentUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (Objects.isNull(authentication)) {
+			return Optional.empty();
+		}
+		return getUserByEmail(authentication.getName());
 	}
 
 	public User addUser(User user) {
