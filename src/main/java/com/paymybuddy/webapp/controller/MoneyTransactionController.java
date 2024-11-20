@@ -39,6 +39,9 @@ public class MoneyTransactionController {
 		List<UserContactDTO> contacts = moneyTransactionService.getUserRelationships();
 		model.addAttribute("contacts", contacts);
 
+		List<MoneyTransactionDTO> transactions = moneyTransactionService.getCurrentUserTransactions();
+		model.addAttribute("transactions", transactions);
+
 		return "main-template";
 	}
 

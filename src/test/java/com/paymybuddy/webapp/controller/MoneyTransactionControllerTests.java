@@ -64,6 +64,24 @@ public class MoneyTransactionControllerTests {
 		}
 
 		@Test
+		@DisplayName("Should get the user's transactions")
+		public void shouldGetTheUserTransactionsIfThereAreTransactions() throws Exception {
+			List<MoneyTransactionDTO> transactions = new ArrayList<>();
+			transactions.add(MoneyTransactionDTO.builder().amount(100.00).description("Test transaction 1").build());
+			transactions.add(MoneyTransactionDTO.builder().amount(150.00).description("Test transaction 2").build());
+			transactions.add(MoneyTransactionDTO.builder().amount(200.00).description("Test transaction 3").build());
+
+			when(moneyTransactionService.getCurrentUserTransactions()).thenReturn(transactions);
+
+			mockMvc.perform(get("/money-transactions"))
+					.andExpect(status().isOk())
+					.andExpect(model().attributeExists("transactions"))
+					.andExpect(model().attribute("transactions", transactions));
+
+			verify(moneyTransactionService, times(1)).getCurrentUserTransactions();
+		}
+
+		@Test
 		@DisplayName("Should get the user's relationships")
 		public void shouldGetTheUserRelationshipsIfThereAreRelationships() throws Exception {
 			List<UserContactDTO> contacts = new ArrayList<>();

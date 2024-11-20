@@ -41,6 +41,21 @@ public class MoneyTransactionService {
 	}
 
 	/**
+	 * Get authenticated user transactions.
+	 *
+	 * @return the transactions list
+	 */
+	public List<MoneyTransactionDTO> getCurrentUserTransactions() {
+		User user = userService.getCurrentUser()
+				.orElseThrow(() -> new UserContextNotFoundException());
+
+		return moneyTransactionRepository.findBySenderId(user)
+				.stream()
+				.map(MoneyTransactionDTO::toDTO)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Create a money transaction between the authenticated user and another user.
 	 *
 	 * @throws UserContextNotFoundException if the authenticated user is not found

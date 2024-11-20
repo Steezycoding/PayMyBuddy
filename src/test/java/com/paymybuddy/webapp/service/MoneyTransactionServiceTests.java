@@ -90,6 +90,80 @@ class MoneyTransactionServiceTests {
 	}
 
 	@Nested
+	@DisplayName("getUserTransactions() Tests")
+	class GetUserTransactionsTests {
+		private User dummySender;
+		private User dummyReceiver;
+
+		@BeforeEach
+		void setUp() {
+			dummySender = User.builder()
+					.id(1L)
+					.username("j.doe")
+					.email("j.doe@email.com")
+					.password("encodedPassword")
+					.role("USER")
+					.balance(100f)
+					.build();
+
+			dummyReceiver = User.builder()
+					.id(2L)
+					.username("k.epf")
+					.email("k.epf@email.com")
+					.password("encodedPassword")
+					.role("USER")
+					.balance(0f)
+					.build();
+		}
+
+		@Test
+		@DisplayName("Should return user transactions if transactions exist")
+		void givenUserTransactionsExist_whenGetUserTransactions_thenReturnUserTransactions() {
+			List<MoneyTransaction> dummyTransactions = new ArrayList<>();
+			MoneyTransaction dummyTransactionOne = MoneyTransaction.builder()
+					.senderId(dummySender)
+					.receiverId(dummyReceiver)
+					.amount(25.75)
+					.description("Payment for services")
+					.build();
+
+			MoneyTransaction dummyTransactionTwo = MoneyTransaction.builder()
+					.senderId(dummySender)
+					.receiverId(dummyReceiver)
+					.amount(50.0)
+					.description("Payment for goods")
+					.build();
+
+			dummyTransactions.add(dummyTransactionOne);
+			dummyTransactions.add(dummyTransactionTwo);
+
+			when(userService.getCurrentUser()).thenReturn(Optional.of(dummySender));
+			when(moneyTransactionRepository.findBySenderId(any(User.class))).thenReturn(dummyTransactions);
+
+			List<MoneyTransactionDTO> expectedTransactions = moneyTransactionService.getCurrentUserTransactions();
+
+			assertThat(expectedTransactions).isNotNull();
+			assertThat(expectedTransactions).hasSize(2);
+			verify(userService, times(1)).getCurrentUser();
+			verify(moneyTransactionRepository, times(1)).findBySenderId(eq(dummySender));
+		}
+
+		@Test
+		@DisplayName("Should empty list if transactions NOT exist")
+		void givenUserTransactionsNotExist_whenGetUserTransactions_thenReturnEmptyList() {
+			when(userService.getCurrentUser()).thenReturn(Optional.of(dummySender));
+			when(moneyTransactionRepository.findBySenderId(any(User.class))).thenReturn(new ArrayList<>());
+
+			List<MoneyTransactionDTO> expectedTransactions = moneyTransactionService.getCurrentUserTransactions();
+
+			assertThat(expectedTransactions).isNotNull();
+			assertThat(expectedTransactions).hasSize(2);
+			verify(userService, times(1)).getCurrentUser();
+			verify(moneyTransactionRepository, times(1)).findBySenderId(eq(dummySender));
+		}
+	}
+
+	@Nested
 	@DisplayName("createMoneyTransaction() Tests")
 	class CreateMoneyTransactionTests {
 		private User dummyAuthUser;

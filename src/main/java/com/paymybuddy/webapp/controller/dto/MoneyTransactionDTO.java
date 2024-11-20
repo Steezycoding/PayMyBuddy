@@ -32,4 +32,13 @@ public class MoneyTransactionDTO {
 				.description(this.description)
 				.build();
 	}
+
+	public static MoneyTransactionDTO toDTO(MoneyTransaction moneyTransaction) {
+		return MoneyTransactionDTO.builder()
+				.amount(moneyTransaction.getAmount())
+				.receiverEmail(moneyTransaction.getReceiverId().getEmail())
+				.receiverUsername(moneyTransaction.getReceiverId().getUsername())
+				.description(moneyTransaction.getDescription())
+				.build();
+	}
 }
