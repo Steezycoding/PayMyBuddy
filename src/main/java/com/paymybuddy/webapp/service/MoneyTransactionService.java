@@ -75,8 +75,8 @@ public class MoneyTransactionService {
 			userService.addUser(receiver);
 
 			MoneyTransaction transaction = transactionDTO.toMoneyTransaction();
-			transaction.setSenderId(sender.getId());
-			transaction.setReceiverId(receiver.getId());
+			transaction.setSenderId(sender);
+			transaction.setReceiverId(receiver);
 
 			return transaction;
 		} catch (Exception e) {

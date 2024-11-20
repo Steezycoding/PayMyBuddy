@@ -24,9 +24,11 @@ public class MoneyTransaction {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "sender", nullable = false)
-	private Long senderId;
+	@ManyToOne
+	@JoinColumn(name = "sender", referencedColumnName = "id", nullable = false)
+	private User senderId;
 
-	@Column(name = "receiver", nullable = false)
-	private Long receiverId;
+	@ManyToOne
+	@JoinColumn(name = "receiver", referencedColumnName = "id", nullable = false)
+	private User receiverId;
 }

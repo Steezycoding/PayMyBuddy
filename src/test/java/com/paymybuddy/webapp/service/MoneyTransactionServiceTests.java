@@ -134,8 +134,8 @@ class MoneyTransactionServiceTests {
 			Float oldReceiverUserBalance = dummyReceiverUser.getBalance();
 
 			MoneyTransaction expectedTransaction = MoneyTransaction.builder()
-					.senderId(dummyAuthUser.getId())
-					.receiverId(dummyReceiverUser.getId())
+					.senderId(dummyAuthUser)
+					.receiverId(dummyReceiverUser)
 					.amount(dummyTransactionDTO.getAmount())
 					.description(dummyTransactionDTO.getDescription())
 					.build();
