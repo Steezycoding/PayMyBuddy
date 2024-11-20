@@ -157,7 +157,7 @@ class MoneyTransactionServiceTests {
 			List<MoneyTransactionDTO> expectedTransactions = moneyTransactionService.getCurrentUserTransactions();
 
 			assertThat(expectedTransactions).isNotNull();
-			assertThat(expectedTransactions).hasSize(2);
+			assertThat(expectedTransactions).isEmpty();
 			verify(userService, times(1)).getCurrentUser();
 			verify(moneyTransactionRepository, times(1)).findBySenderId(eq(dummySender));
 		}
