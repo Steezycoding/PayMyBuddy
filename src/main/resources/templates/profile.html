@@ -4,17 +4,21 @@
     <div th:fragment="content" >
         <form th:action="@{/profile}" th:object="${user}" method="post">
             <div class="row mb-3">
-                <label for="username" class="col-4 col-form-label">Username</label>
-                <div class="col-sm-8">
+                <label for="username" class="col-sm-4 col-form-label fw-bold">Username</label>
+                <div class="col-sm-6">
                     <input type="text"
                            th:field="*{username}"
                            name="username"
-                           class="form-control"
+                           class="form-control-plaintext"
                            th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
                            id="username"
                            placeholder="Username"
                            aria-required="true"
+                           readonly="false"
                            required>
+                </div>
+                <div class="col-sm-2 d-flex justify-content-end align-items-center">
+                    <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('username')"></i>
                 </div>
 
                 <div th:if="${#fields.hasErrors('username')}"
@@ -24,17 +28,21 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="email" class="col-4 col-form-label">Email</label>
-                <div class="col-sm-8">
+                <label for="email" class="col-4 col-form-label fw-bold">Email</label>
+                <div class="col-sm-6">
                     <input type="email"
                            th:field="*{email}"
                            name="email"
-                           class="form-control"
+                           class="form-control-plaintext"
                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
                            id="email"
                            placeholder="Email"
                            aria-required="true"
+                           readonly
                            required>
+                </div>
+                <div class="col-sm-2 d-flex justify-content-end align-items-center">
+                    <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('email')"></i>
                 </div>
 
                 <div th:if="${#fields.hasErrors('email')}"
@@ -44,17 +52,21 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="email" class="col-4 col-form-label">Password</label>
-                <div class="col-sm-8">
+                <label for="email" class="col-4 col-form-label fw-bold">Password</label>
+                <div class="col-sm-6">
                     <input type="password"
                            th:field="*{password}"
                            name="email"
-                           class="form-control"
+                           class="form-control-plaintext"
                            th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
                            id="password"
                            placeholder="Password"
                            aria-required="true"
+                           readonly
                            required>
+                </div>
+                <div class="col-sm-2 d-flex justify-content-end align-items-center">
+                    <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('password')"></i>
                 </div>
 
                 <div th:if="${#fields.hasErrors('email')}"
@@ -63,10 +75,23 @@
                     <p th:errors="*{password}">Password error</p>
                 </div>
             </div>
-            <div class="align-items-end">
-                <button type="submit" class="btn btn-primary">Update</button>
+            <div class="row mb-3 justify-content-end">
+                <button type="submit" class="btn btn-orange col-sm-4">Update</button>
             </div>
         </form>
+        <script>
+            function toggleReadonly(inputId) {
+                const input = document.getElementById(inputId);
+                if (input.readOnly) {
+                    input.classList.remove('form-control-plaintext');
+                    input.classList.add('form-control');
+                } else {
+                    input.classList.remove('form-control');
+                    input.classList.add('form-control-plaintext');
+                }
+                input.readOnly = !input.readOnly;
+            }
+        </script>
     </div>
 </body>
 </html>
