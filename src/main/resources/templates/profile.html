@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
     <div th:fragment="content" >
-        <form th:action="@{/profile}" th:object="${user}" method="post">
+        <form th:action="@{/profile}" th:object="${user}" method="post" onsubmit="removeReadonly()">
             <div class="row mb-3">
                 <label for="username" class="col-sm-4 col-form-label fw-bold">Username</label>
                 <div class="col-sm-6">
@@ -14,8 +14,7 @@
                            id="username"
                            placeholder="Username"
                            aria-required="true"
-                           readonly="false"
-                           required>
+                           readonly>
                 </div>
                 <div class="col-sm-2 d-flex justify-content-end align-items-center">
                     <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('username')"></i>
@@ -38,8 +37,7 @@
                            id="email"
                            placeholder="Email"
                            aria-required="true"
-                           readonly
-                           required>
+                           readonly>
                 </div>
                 <div class="col-sm-2 d-flex justify-content-end align-items-center">
                     <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('email')"></i>
@@ -62,8 +60,7 @@
                            id="password"
                            placeholder="Password"
                            aria-required="true"
-                           readonly
-                           required>
+                           readonly>
                 </div>
                 <div class="col-sm-2 d-flex justify-content-end align-items-center">
                     <i class="bi bi-chevron-right clickable" onclick="toggleReadonly('password')"></i>
@@ -85,11 +82,19 @@
                 if (input.readOnly) {
                     input.classList.remove('form-control-plaintext');
                     input.classList.add('form-control');
+                    input.removeAttribute('readonly');
+                    input.setAttribute('required', '');
                 } else {
                     input.classList.remove('form-control');
                     input.classList.add('form-control-plaintext');
+                    input.setAttribute('readonly', '');
+                    input.removeAttribute('required');
                 }
-                input.readOnly = !input.readOnly;
+            }
+
+            function removeReadonly() {
+                const inputs = document.querySelectorAll('input[readonly]');
+                inputs.forEach(input => input.removeAttribute('readonly'));
             }
         </script>
     </div>
