@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
@@ -22,12 +22,6 @@ import static org.mockito.Mockito.*;
 public class UserServiceTests {
 	@Mock
 	private UserRepository userRepository;
-
-	@Mock
-	private SecurityContext securityContext;
-
-	@Mock
-	private Authentication authentication;
 
 	@InjectMocks
 	private UserService userService;
@@ -43,6 +37,14 @@ public class UserServiceTests {
 				.password("password")
 				.role("USER")
 				.build();
+	}
+
+	@BeforeEach
+	void setUp() {
+		// Manual set up of Security Context for all tests
+		UsernamePasswordAuthenticationToken authentication =
+				new UsernamePasswordAuthenticationToken(dummyUser.getEmail(), dummyUser.getPassword(), null);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
 	@Nested
@@ -75,18 +77,10 @@ public class UserServiceTests {
 	@Nested
 	@DisplayName("getCurrentUser() Tests")
 	class GetCurrentUserTests {
-		@BeforeEach
-		void setUp() {
-			SecurityContextHolder.setContext(securityContext);
-		}
-
 		@Test
 		@DisplayName("Should return user if authentication exists")
 		void givenAuthenticationExists_whenGetCurrentUser_thenReturnUser() {
-			String authName = "j.doe@email.com";
-			when(securityContext.getAuthentication()).thenReturn(authentication);
-			when(authentication.getName()).thenReturn(authName);
-			when(userService.getUserByEmail("j.doe@email.com")).thenReturn(Optional.of(dummyUser));
+			when(userService.getUserByEmail(dummyUser.getEmail())).thenReturn(Optional.of(dummyUser));
 
 			Optional<User> result = userService.getCurrentUser();
 
@@ -97,7 +91,7 @@ public class UserServiceTests {
 		@Test
 		@DisplayName("Should return empty if authentication NOT exists")
 		void givenAuthenticationNotExists_whenGetCurrentUser_thenReturnEmpty() {
-			when(securityContext.getAuthentication()).thenReturn(null);
+			SecurityContextHolder.clearContext();
 
 			Optional<User> result = userService.getCurrentUser();
 
@@ -144,6 +138,33 @@ public class UserServiceTests {
 
 			verify(userRepository, times(1)).findByEmail(eq(dummyUser.getEmail()));
 			assertThat(actual).isFalse();
+		}
+	}
+
+	@Nested
+	@DisplayName("updateUser() Tests")
+	class UpdateUserTests {
+		@Test
+		@DisplayName("Should update User")
+		void givenValidUser_whenUpdateUser_thenUpdateSuccessfully() {
+			User updatedUser = User.builder()
+					.id(1L)
+					.username("updated.username")
+					.email("updated.username@email.com")
+					.password("updatedPassword")
+					.role("USER")
+					.build();
+
+			when(userRepository.save(any(User.class))).thenReturn(updatedUser);
+
+			userService.updateUser(updatedUser);
+
+			Authentication updatedAuthentication = SecurityContextHolder.getContext().getAuthentication();
+
+			assertThat(updatedAuthentication).isNotNull();
+			assertThat(updatedAuthentication.getName()).isEqualTo(updatedUser.getEmail());
+
+			verify(userRepository, times(1)).save(updatedUser);
 		}
 	}
 }

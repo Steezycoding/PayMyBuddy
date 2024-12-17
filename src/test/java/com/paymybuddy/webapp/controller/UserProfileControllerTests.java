@@ -12,8 +12,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class UserProfileControllerTests {
@@ -64,6 +66,37 @@ class UserProfileControllerTests {
 			mockMvc.perform(get("/profile"))
 					.andExpect(model().attributeExists("user"))
 					.andExpect(model().attribute("user", dummyUserProfile));
+		}
+	}
+
+	@Nested
+	@DisplayName("POST /profile Tests")
+	class PostProfileTests {
+		UserProfileDTO dummyGetUserProfile = UserProfileDTO.builder()
+				.username("j.doe")
+				.email("j.doe@email.com")
+				.password("encodedPassword")
+				.build();
+
+		UserProfileDTO dummyUpdatedUserProfile = UserProfileDTO.builder()
+				.username("updatedUsername")
+				.email("updated@email.com")
+				.password("val1dPUpdAt€dP@ssword")
+				.build();
+
+		@Test
+		@DisplayName("Should update the user profile")
+		void shouldUpdateTheUserProfile() throws Exception {
+			when(userProfileService.getUserProfile()).thenReturn(dummyGetUserProfile);
+
+			mockMvc.perform(post("/profile")
+						.param("username", dummyUpdatedUserProfile.getUsername())
+						.param("email", dummyUpdatedUserProfile.getEmail())
+						.param("password", dummyUpdatedUserProfile.getPassword()))
+					.andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("/profile"));
+
+			verify(userProfileService, times(1)).updateUser(eq(dummyUpdatedUserProfile));
 		}
 	}
 }

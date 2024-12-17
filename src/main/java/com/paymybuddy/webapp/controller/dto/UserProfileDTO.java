@@ -22,8 +22,5 @@ public class UserProfileDTO {
 	@Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$", message = "Email should be valid.")
 	private String email;
 
-	@NotBlank(message = "Password is mandatory")
-	@Pattern(regexp = "^(?! )[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]*(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).*$", message = "Password must contain at least one letter, one number, one special character and never begin with space.")
-	@Size(min = 8, max = 128, message = "Password must be between 8 and 128 characters long.")
 	private String password;
 }
