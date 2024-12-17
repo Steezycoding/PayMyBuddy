@@ -3,6 +3,7 @@ package com.paymybuddy.webapp.service;
 import com.paymybuddy.webapp.exception.UserContextNotFoundException;
 import com.paymybuddy.webapp.exception.UserNotFoundException;
 import com.paymybuddy.webapp.exception.UserRelationshipAlreadyExistsException;
+import com.paymybuddy.webapp.exception.UserRelationshipNoRelationException;
 import com.paymybuddy.webapp.model.User;
 import com.paymybuddy.webapp.model.UserRelationship;
 import com.paymybuddy.webapp.model.UserRelationshipId;
@@ -10,11 +11,15 @@ import com.paymybuddy.webapp.repository.UserRelationshipRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class UserRelationshipService {
-	private UserRelationshipRepository userRelationshipRepository;
-	private UserService userService;
+	private final UserRelationshipRepository userRelationshipRepository;
+	private final UserService userService;
 
 	public UserRelationshipService(UserRelationshipRepository userRelationshipRepository, UserService userService) {
 		this.userRelationshipRepository = userRelationshipRepository;
@@ -49,5 +54,29 @@ public class UserRelationshipService {
 				.build();
 
 		return userRelationshipRepository.save(relationship);
+	}
+
+	/***
+	 * Gets all relationships of the current (authenticated) user.
+	 *
+	 * @return the list of all user relationships
+	 * @throws UserContextNotFoundException if the authenticated user can not be retrieved
+	 * @throws UserRelationshipNoRelationException if no relationship found for the authenticated user
+	 */
+	public List<User> getRelationships() {
+		User currentUser = userService.getCurrentUser()
+				.orElseThrow(() -> new UserContextNotFoundException());
+
+		Optional<List<UserRelationship>> relationships = userRelationshipRepository.findByUserId(currentUser);
+
+		if (relationships.isEmpty() || relationships.get().isEmpty()) {
+			throw new UserRelationshipNoRelationException(currentUser);
+		}
+
+		return relationships
+				.get()
+				.stream()
+				.map(UserRelationship::getRelationUserId)
+				.collect(Collectors.toList());
 	}
 }
