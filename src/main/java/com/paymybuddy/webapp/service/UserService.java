@@ -22,10 +22,22 @@ public class UserService {
 		this.userRepository = userRepository;
 	}
 
+	/**
+	 * Get a user by email.
+	 *
+	 * @param email the email
+	 * @return the user
+	 */
 	public Optional<User> getUserByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
 
+	/**
+	 * Get the current user.
+	 * <p><em>Uses the current authentication context to get the current user.</em></p>
+	 *
+	 * @return the current user
+	 */
 	public Optional<User> getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (Objects.isNull(authentication)) {
@@ -34,15 +46,32 @@ public class UserService {
 		return getUserByEmail(authentication.getName());
 	}
 
+	/**
+	 * Add a new user.
+	 *
+	 * @param user the user
+	 * @return the user
+	 */
 	public User addUser(User user) {
 		return userRepository.save(user);
 	}
 
+	/**
+	 * Update a user.
+	 *
+	 * @param user the user
+	 */
 	public void updateUser(User user) {
 		userRepository.save(user);
 		updateUserSecurityContext(user);
 	}
 
+	/**
+	 * Check if a user exists.
+	 *
+	 * @param user the user
+	 * @return true if the user exists, false otherwise
+	 */
 	public boolean userExists(User user) {
 		return userRepository.findByEmail(user.getEmail()).isPresent();
 	}
