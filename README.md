@@ -52,4 +52,4 @@ All Maven commands should be executed with `./mvnw`_
 4. **Endpoints**:
 
    API and actuators endpoints documentation is generated and reachable on **runtime**
-   at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+   at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) with admin user.

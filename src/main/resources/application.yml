@@ -2,8 +2,9 @@ spring:
   application:
     name: PayMyBuddy
 springdoc:
-  packages-to-scan: com.paymybuddy.webapp.resource
+  packages-to-scan: com.paymybuddy.webapp.controller
   show-actuator: true
-  enable-spring-security: false
+  enable-spring-security: true
+  model-and-view-allowed: true
   swagger-ui:
-    try-it-out-enabled: true
+    try-it-out-enabled: false
