@@ -23,3 +23,10 @@ logging:
     org:
       springframework:
         security: DEBUG
+springdoc:
+  packages-to-scan: com.paymybuddy.webapp.controller
+  show-actuator: true
+  enable-spring-security: true
+  model-and-view-allowed: true
+  swagger-ui:
+    try-it-out-enabled: false

@@ -8,6 +8,11 @@ import com.paymybuddy.webapp.exception.MoneyTransactionNegativeAmountException;
 import com.paymybuddy.webapp.exception.UserRelationshipNoRelationException;
 import com.paymybuddy.webapp.service.MoneyTransactionService;
 import com.paymybuddy.webapp.utils.Alert;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +35,8 @@ public class MoneyTransactionController {
 		this.moneyTransactionService = moneyTransactionService;
 	}
 
+	@Operation(summary = "Get the money transaction page", description = "Returns the money transaction page")
+	@ApiResponse(responseCode = "200", description = "Money transaction page loaded successfully")
 	@GetMapping
 	public String moneyTransactionPage(Model model) {
 		model.addAttribute("title", "Transactions");
@@ -45,6 +52,10 @@ public class MoneyTransactionController {
 		return "main-template";
 	}
 
+	@Operation(summary = "Create a money transaction",
+			description = "Creates a money transaction for the currently logged-in user",
+			requestBody = @RequestBody(content = @Content(mediaType = "multipart/form-data",
+					schema = @Schema(implementation = MoneyTransactionDTO.class))))
 	@PostMapping
 	public String createMoneyTransaction(@Valid @ModelAttribute("transaction") MoneyTransactionDTO transaction,
 										 BindingResult result,
