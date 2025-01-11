@@ -6,6 +6,11 @@ import com.paymybuddy.webapp.exception.UserRelationshipException;
 import com.paymybuddy.webapp.model.UserRelationship;
 import com.paymybuddy.webapp.service.UserRelationshipService;
 import com.paymybuddy.webapp.utils.Alert;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +34,8 @@ public class UserRelationshipController {
 		this.userRelationshipService = userRelationshipService;
 	}
 
+	@Operation(summary = "Get the relationships page", description = "Returns the relationships page")
+	@ApiResponse(responseCode = "200", description = "Relationships page loaded successfully")
 	@GetMapping
 	public String relationshipsPage(Model model) {
 		model.addAttribute("title", "Relationships");
@@ -37,6 +44,11 @@ public class UserRelationshipController {
 		return "main-template";
 	}
 
+	@Operation(summary = "Add a new user relation",
+			description = "Adds a new user relation with the provided email",
+			requestBody = @RequestBody(content = @Content(mediaType = "multipart/form-data",
+					schema = @Schema(implementation = EmailDTO.class))))
+	@ApiResponse(responseCode = "302", description = "User relation added successfully")
 	@PostMapping
 	public String addRelation(@Valid @ModelAttribute("emailDTO") EmailDTO emailDTO, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
