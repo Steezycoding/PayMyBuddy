@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: PayMyBuddy
+  datasource:
+    url: jdbc:mysql://localhost:3306/paymybuddy?serverTimezone=UTC
+    username: root
+    password:
+springdoc:
+  packages-to-scan: com.paymybuddy.webapp.controller
+  show-actuator: true
+  enable-spring-security: true
+  model-and-view-allowed: true
+  swagger-ui:
+    try-it-out-enabled: false

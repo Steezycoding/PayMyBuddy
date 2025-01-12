@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content" class="d-flex flex-column align-items-center justify-content-center">
+        <div class="mb-3">
+            <form th:action="@{/money-transactions}" th:object="${transaction}" method="post" class="row align-items-center">
+                <div class="col">
+                    <select th:field="*{receiverEmail}"
+                            class="form-select"
+                            id="contactSelect"
+                            aria-label="Contact list"
+                            onchange="updateReceiverUsername()" required>
+                        <option value="" class="fst-italic" selected>Select a relation</option>
+                        <option th:if="${contacts}"
+                                th:each="contact : ${contacts}"
+                                th:value="${contact.email}"
+                                th:data-username="${contact.username}"
+                                th:text="${contact.username}">
+                        </option>
+                    </select>
+                    <input type="hidden" th:field="*{receiverUsername}" id="receiverUsername" name="receiverUsername" />
+                </div>
+                <div class="col-auto">
+                    <div class="form-floating">
+                        <input type="text"
+                               th:field="*{description}"
+                               name="description"
+                               class="form-control"
+                               id="description"
+                               placeholder="Enter a description for this transaction" />
+                        <label for="description">Description</label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="number"
+                               th:field="*{amount}"
+                               name="amount"
+                               class="form-control"
+                               id="amount"
+                               placeholder="0"
+                               aria-label="Amount of transaction" />
+                        <span class="input-group-text">€</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-lg">Pay</button>
+                </div>
+            </form>
+        </div>
+        <div class="card w-100">
+            <div class="card-body">
+                <h5 class="card-title">My transactions</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Relation</th>
+                            <th scope="col">Description</th>
+                            <th scope="col" class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr th:if="${#lists.isEmpty(transactions)}">
+                            <td colspan="3" class="text-center">No transactions yet</td>
+                        </tr>
+                        <tr th:unless="${#lists.isEmpty(transactions)}" th:each="transaction : ${transactions}">
+                            <td th:text="${transaction.receiverUsername}"></td>
+                            <td th:text="${transaction.description}"></td>
+                            <td th:text="${transaction.amount} + ' €'" class="text-end"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function updateReceiverUsername() {
+                const select = document.getElementById('contactSelect');
+                const selectedOption = select.options[select.selectedIndex];
+                const username = selectedOption.getAttribute('data-username');
+                document.getElementById('receiverUsername').value = username || '';
+            }
+        </script>
+    </div>
+</body>
+</html>

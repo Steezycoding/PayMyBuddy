@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="content" class="container-fluid h-100 d-flex align-items-center justify-content-center">
+        <form th:action="@{/relationships}" th:object="${emailDTO}" class="row" method="post">
+            <div class="col-auto">
+                <label for="email" class="form-label fw-bold">Find relation</label>
+                <input type="email"
+                       th:field="*{email}"
+                       class="form-control form-control-lg"
+                       id="email"
+                       placeholder="Enter email address">
+            </div>
+            <div th:if="${#fields.hasErrors('email')}"
+                 class="text-danger text-start"
+                 aria-invalid="true">
+                <p th:errors="*{email}">Email error</p>
+            </div>
+            <div class="col-auto align-self-end">
+                <button type="submit" class="btn btn-lg btn-warning fw-bold text-white">Add</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

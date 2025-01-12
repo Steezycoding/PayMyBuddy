@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: PayMyBuddy|DEV
+  datasource:
+    url: jdbc:mysql://localhost:3306/paymybuddy_dev_martru?serverTimezone=UTC
+    username: paymybuddy
+    password: paymybuddy
+  docker:
+    compose:
+      enabled: true
+      file: ./scripts/docker-compose.yml
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+  thymeleaf:
+    cache: false
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+springdoc:
+  packages-to-scan: com.paymybuddy.webapp.controller
+  show-actuator: true
+  enable-spring-security: true
+  model-and-view-allowed: true
+  swagger-ui:
+    try-it-out-enabled: false

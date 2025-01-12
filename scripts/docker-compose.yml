@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: 'mysql:lts'
+    container_name: 'paymybuddy_martru'
+    environment:
+      - 'MYSQL_DATABASE=paymybuddy_dev_martru'
+      - 'MYSQL_USER=paymybuddy'
+      - 'MYSQL_PASSWORD=paymybuddy'
+      - 'MYSQL_ROOT_PASSWORD=VerySecretSoMuchSecureWow'
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/db_schema_dev.sql:/docker-entrypoint-initdb.d/1_schema.sql
+      - ./database/db_data_dev.sql:/docker-entrypoint-initdb.d/2_data.sql
+
+volumes:
+  mysql-data:
